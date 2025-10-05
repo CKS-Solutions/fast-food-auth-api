@@ -54,7 +54,7 @@ exports.handler = async (event) => {
 
     const searchParams = {
       UserPoolId: userPoolId,
-      Filter: `custom:cpf = "${cpf}"`,
+      Filter: `preferred_username = "${cpf}"`,
       Limit: 1,
     };
 
