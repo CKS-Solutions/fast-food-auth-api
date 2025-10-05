@@ -3,24 +3,28 @@ resource "aws_cognito_user_pool" "fast_food_user_pool" {
   name = var.user_pool_name
 
   schema {
-    name                = "email"
-    attribute_data_type = "String"
-    required            = true
-    mutable             = true
+    name                     = "email"
+    attribute_data_type      = "String"
+    required                 = true
+    mutable                  = true
+    developer_only_attribute = false
   }
 
   schema {
-    name                = "name"
-    attribute_data_type = "String"
-    required            = true
-    mutable             = true
+    name                     = "name"
+    attribute_data_type      = "String"
+    required                 = true
+    mutable                  = true
+    developer_only_attribute = false
   }
 
   schema {
     name                     = "cpf"
     attribute_data_type      = "String"
     mutable                  = false
+    required                 = false
     developer_only_attribute = false
+    string_attribute_constraints {}
   }
 
   username_attributes = ["email"]
