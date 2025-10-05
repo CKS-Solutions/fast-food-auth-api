@@ -45,6 +45,7 @@ module "lambda" {
   aws_region           = var.aws_region
   environment_variables = {
     NODE_ENV = var.environment
+    JWT_SECRET = "fast-food-jwt-secret"
   }
   tags = {
     Environment = var.environment
