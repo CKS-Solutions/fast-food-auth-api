@@ -10,7 +10,7 @@ This directory contains Terraform configuration for all infrastructure of the pr
 ## Setup
 
 1. **Configure aws profile**
-   * Configure the aws profile using the `aws configure` command.
+   * Configure the aws profile using the `aws configure sso` command.
    * Appoint the profile to account-dev.
    * The profile must be named `dev-admin` (you can change it in envs/dev/backend.hcl and variables.tf)
 
