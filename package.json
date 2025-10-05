@@ -1,0 +1,23 @@
+{
+  "name": "fast-food-auth-api",
+  "version": "1.0.0",
+  "description": "Fast Food Authentication API using AWS Lambda and Cognito",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run build:auth",
+    "build:auth": "cd src/auth && npm install --production",
+    "build:all": "npm run build:auth",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "aws",
+    "lambda",
+    "cognito",
+    "authentication",
+    "fast-food"
+  ],
+  "author": "",
+  "license": "MIT"
+}

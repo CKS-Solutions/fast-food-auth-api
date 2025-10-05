@@ -22,8 +22,9 @@ resource "null_resource" "assert_account" {
 module "iam" {
   source = "./modules/iam"
 
-  lambda_role_name  = "fast-food-lambda-role"
-  enable_vpc_access = false
+  lambda_role_name      = "fast-food-lambda-role"
+  enable_vpc_access     = false
+  cognito_user_pool_arn = module.cognito.user_pool_arn
   tags = {
     Environment = var.environment
     Project     = "fast-food"
@@ -34,11 +35,14 @@ module "iam" {
 module "lambda" {
   source = "./modules/lambda"
 
-  function_name   = "fast-food-api"
-  lambda_role_arn = module.iam.lambda_role_arn
-  runtime         = "nodejs18.x"
-  timeout         = 30
-  memory_size     = 128
+  function_name        = "fast-food-api"
+  lambda_role_arn      = module.iam.lambda_role_arn
+  runtime              = "nodejs18.x"
+  timeout              = 30
+  memory_size          = 128
+  cognito_user_pool_id = module.cognito.user_pool_id
+  cognito_client_id    = module.cognito.user_pool_client_id
+  aws_region           = var.aws_region
   environment_variables = {
     NODE_ENV = var.environment
   }
@@ -66,6 +70,17 @@ module "api_gateway" {
   }
 }
 
+# Cognito Module
+module "cognito" {
+  source = "./modules/cognito"
+
+  user_pool_name = var.user_pool_name
+  tags = {
+    Environment = var.environment
+    Project     = "fast-food"
+  }
+}
+
 # Outputs
 output "api_gateway_base_url" {
   description = "Base URL of the API Gateway"
@@ -85,4 +100,19 @@ output "lambda_function_name" {
 output "lambda_function_arn" {
   description = "ARN of the Lambda function"
   value       = module.lambda.lambda_function_arn
+}
+
+output "cognito_user_pool_id" {
+  description = "ID of the Cognito User Pool"
+  value       = module.cognito.user_pool_id
+}
+
+output "cognito_user_pool_arn" {
+  description = "ARN of the Cognito User Pool"
+  value       = module.cognito.user_pool_arn
+}
+
+output "cognito_user_pool_client_id" {
+  description = "ID of the Cognito User Pool Client"
+  value       = module.cognito.user_pool_client_id
 }

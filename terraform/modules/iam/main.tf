@@ -30,3 +30,31 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_access" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
+
+# IAM policy for Cognito access
+resource "aws_iam_role_policy" "lambda_cognito_policy" {
+  name = "${var.lambda_role_name}-cognito-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "cognito-idp:AdminGetUser",
+          "cognito-idp:AdminCreateUser",
+          "cognito-idp:AdminUpdateUserAttributes",
+          "cognito-idp:AdminDeleteUser",
+          "cognito-idp:AdminSetUserPassword",
+          "cognito-idp:AdminInitiateAuth",
+          "cognito-idp:AdminRespondToAuthChallenge",
+          "cognito-idp:ListUsers",
+          "cognito-idp:DescribeUserPool",
+          "cognito-idp:DescribeUserPoolClient"
+        ]
+        Resource = var.cognito_user_pool_arn
+      }
+    ]
+  })
+}

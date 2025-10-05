@@ -40,3 +40,19 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "cognito_user_pool_id" {
+  description = "ID of the Cognito User Pool"
+  type        = string
+}
+
+variable "cognito_client_id" {
+  description = "ID of the Cognito App Client"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
