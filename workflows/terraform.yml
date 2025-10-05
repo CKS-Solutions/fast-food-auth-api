@@ -44,7 +44,8 @@ jobs:
         run: |
           terraform plan -input=false \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }}
+            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }} \
+            -var jwt_secret=${{ secrets.JWT_SECRET }}
 
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -52,4 +53,5 @@ jobs:
         run: |
           terraform apply -input=false -auto-approve \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }}
+            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }} \
+            -var jwt_secret=${{ secrets.JWT_SECRET }}

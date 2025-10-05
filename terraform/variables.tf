@@ -27,3 +27,9 @@ variable "user_pool_name" {
   type        = string
   default     = "fast-food-user-pool"
 }
+
+variable "jwt_secret" {
+  description = "JWT secret"
+  type        = string
+  default     = "fast-food-jwt-secret"
+}
