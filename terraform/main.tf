@@ -36,7 +36,6 @@ module "lambda" {
 
   function_name   = "fast-food-api"
   lambda_role_arn = module.iam.lambda_role_arn
-  handler         = "index.handler"
   runtime         = "nodejs18.x"
   timeout         = 30
   memory_size     = 128
