@@ -44,7 +44,7 @@ module "lambda" {
   cognito_client_id    = module.cognito.user_pool_client_id
   aws_region           = var.aws_region
   environment_variables = {
-    NODE_ENV = var.environment
+    NODE_ENV   = var.environment
     JWT_SECRET = var.jwt_secret
   }
   tags = {
