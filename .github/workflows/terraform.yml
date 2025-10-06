@@ -30,13 +30,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Build all lambdas
+        run: npm run build:all
+
       - name: Terraform Init
         working-directory: terraform
         run: terraform init -input=false -backend-config="envs/prod/backend.hcl"
-
-      - name: Terraform Validate
-        working-directory: terraform
-        run: terraform validate
 
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
@@ -44,7 +43,9 @@ jobs:
         run: |
           terraform plan -input=false \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }}
+            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }} \
+            -var jwt_secret=${{ secrets.JWT_SECRET }} \
+            -var environment=production
 
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -52,4 +53,6 @@ jobs:
         run: |
           terraform apply -input=false -auto-approve \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }}
+            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }} \
+            -var jwt_secret=${{ secrets.JWT_SECRET }} \
+            -var environment=production

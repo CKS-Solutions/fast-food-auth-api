@@ -9,12 +9,6 @@ variable "lambda_role_arn" {
   type        = string
 }
 
-variable "handler" {
-  description = "Lambda function handler"
-  type        = string
-  default     = "index.handler"
-}
-
 variable "runtime" {
   description = "Lambda runtime"
   type        = string
@@ -41,34 +35,24 @@ variable "environment_variables" {
   }
 }
 
-variable "lambda_code" {
-  description = "Lambda function code"
-  type        = string
-  default     = <<EOF
-exports.handler = async (event) => {
-    console.log('Event:', JSON.stringify(event, null, 2));
-    
-    return {
-        statusCode: 200,
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
-        },
-        body: JSON.stringify({
-            message: 'Hello from Fast Food API!',
-            timestamp: new Date().toISOString(),
-            path: event.path,
-            method: event.httpMethod
-        })
-    };
-};
-EOF
-}
-
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)
   default     = {}
+}
+
+variable "cognito_user_pool_id" {
+  description = "ID of the Cognito User Pool"
+  type        = string
+}
+
+variable "cognito_client_id" {
+  description = "ID of the Cognito App Client"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
 }

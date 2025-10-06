@@ -10,12 +10,13 @@ This directory contains Terraform configuration for all infrastructure of the pr
 ## Setup
 
 1. **Configure aws profile**
-   * Configure the aws profile using the `aws configure` command.
+   * Configure the aws profile using the `aws configure sso` command.
    * Appoint the profile to account-dev.
    * The profile must be named `dev-admin` (you can change it in envs/dev/backend.hcl and variables.tf)
 
 2. **Login in AWS**
-   login in AWS using the `aws login` command.
+   login in AWS using the `aws sso login --profile dev-admin` command.
+   set the env variable `$env:AWS_PROFILE = "dev-admin"`
 
 3. **Initialize Terraform**:
    ```bash
@@ -39,4 +40,5 @@ This directory contains Terraform configuration for all infrastructure of the pr
 2. **No valid credential sources found**
    * This error occurs when the AWS profile is not configured correctly.
    * To solve it, you can:
-      - Try to login in AWS using the `aws login` command.
+      - Try to login in AWS using the `aws sso login` command.
+      - terraform init -reconfigure -backend-config="envs/dev/backend.hcl" -var aws_profile=dev-admin(or the profile you are using)

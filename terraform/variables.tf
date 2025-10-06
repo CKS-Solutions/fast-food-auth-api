@@ -4,12 +4,6 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "aws_profile" {
-  description = "AWS profile for resources"
-  type        = string
-  default     = "default" # or profile saved locally in aws cli
-}
-
 variable "expected_account_id" {
   description = "Expected AWS account ID"
   type        = string
@@ -20,4 +14,16 @@ variable "environment" {
   description = "Environment name"
   type        = string
   default     = "development"
+}
+
+variable "user_pool_name" {
+  description = "Name of the Cognito User Pool"
+  type        = string
+  default     = "fast-food-user-pool"
+}
+
+variable "jwt_secret" {
+  description = "JWT secret"
+  type        = string
+  default     = "fast-food-jwt-secret"
 }

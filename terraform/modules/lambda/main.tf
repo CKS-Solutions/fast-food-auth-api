@@ -1,27 +1,38 @@
+# Build Lambda package with dependencies
+resource "null_resource" "lambda_build" {
+  triggers = {
+    source_hash  = filemd5("${path.module}/../../../src/auth/index.js")
+    package_hash = filemd5("${path.module}/../../../src/auth/package.json")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      cd ${path.module}/../../../src/auth
+      npm install --production
+      zip -r /tmp/lambda_function.zip .
+    EOT
+  }
+}
+
 # Lambda function
 resource "aws_lambda_function" "api_lambda" {
-  filename         = data.archive_file.lambda_zip.output_path
+  filename         = "/tmp/lambda_function.zip"
   function_name    = var.function_name
   role             = var.lambda_role_arn
-  handler          = var.handler
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  handler          = "index.handler"
+  source_code_hash = filebase64sha256("/tmp/lambda_function.zip")
   runtime          = var.runtime
   timeout          = var.timeout
   memory_size      = var.memory_size
 
   environment {
-    variables = var.environment_variables
+    variables = merge(var.environment_variables, {
+      COGNITO_USER_POOL_ID = var.cognito_user_pool_id
+      COGNITO_CLIENT_ID    = var.cognito_client_id
+    })
   }
 
   tags = var.tags
-}
 
-# Create a simple hello world Lambda function
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  output_path = "/tmp/lambda_function.zip"
-  source {
-    content  = var.lambda_code
-    filename = "index.js"
-  }
+  depends_on = [null_resource.lambda_build]
 }

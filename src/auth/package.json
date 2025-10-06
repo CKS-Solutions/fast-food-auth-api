@@ -1,0 +1,25 @@
+{
+  "name": "fast-food-auth-lambda",
+  "version": "1.0.0",
+  "description": "Fast Food Authentication Lambda Function",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install --production",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.450.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "aws",
+    "lambda",
+    "cognito",
+    "authentication",
+    "jwt",
+    "fast-food"
+  ],
+  "author": "",
+  "license": "MIT"
+}
