@@ -82,6 +82,16 @@ module "cognito" {
   }
 }
 
+# S3 Module
+module "s3" {
+  source = "./modules/s3"
+
+  tags = {
+    Environment = var.environment
+    Project     = "fast-food"
+  }
+}
+
 # Outputs
 output "api_gateway_base_url" {
   description = "Base URL of the API Gateway"

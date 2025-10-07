@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build:auth",
-    "build:auth": "cd src/auth && npm install --production && zip -r /tmp/lambda_function.zip . -x \"**/.git/**\" \"**/.github/**\" \"**/node_modules/.cache/**\"",
+    "build:auth": "cd src/auth && npm install --production",
     "build:all": "npm run build:auth",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
