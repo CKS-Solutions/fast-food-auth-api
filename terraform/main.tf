@@ -43,6 +43,11 @@ module "lambda" {
   cognito_user_pool_id = module.cognito.user_pool_id
   cognito_client_id    = module.cognito.user_pool_client_id
   aws_region           = var.aws_region
+  lambda_bucket_id     = module.s3.lambda_bucket_id
+  lambda_struct = {
+    lambda_auth_key          = module.s3.lambda_auth_key
+    lambda_auth_base64sha256 = module.s3.lambda_auth_base64sha256
+  }
   environment_variables = {
     NODE_ENV   = var.environment
     JWT_SECRET = var.jwt_secret

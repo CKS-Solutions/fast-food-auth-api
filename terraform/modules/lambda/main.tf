@@ -1,18 +1,18 @@
 resource "aws_lambda_function" "api_lambda" {
-  function_name    = var.function_name
+  function_name = var.function_name
 
-  s3_bucket = aws_s3_bucket.lambda_bucket.id
-  s3_key = aws_s3_object.lambda_auth.key
+  s3_bucket = var.lambda_bucket_id
+  s3_key    = var.lambda_struct.lambda_auth_key
 
-  runtime          = var.runtime
-  handler          = "index.handler"
+  runtime = var.runtime
+  handler = "index.handler"
 
-  source_code_hash = data.archive_file.lambda_auth.output_base64sha256
+  source_code_hash = var.lambda_struct.lambda_auth_base64sha256
 
-  timeout          = var.timeout
-  memory_size      = var.memory_size
+  timeout     = var.timeout
+  memory_size = var.memory_size
 
-  role             = var.lambda_role_arn
+  role = var.lambda_role_arn
 
   environment {
     variables = merge(var.environment_variables, {
