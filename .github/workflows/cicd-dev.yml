@@ -6,19 +6,20 @@ on:
   push:
     branches: [ "develop" ]
 
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: dev-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+
 jobs:
-  build:
+  plan:
     runs-on: ubuntu-latest
-    environment: 
-      name: fast-food-auth-api-env-dev
-      url: ""
-
-    permissions:
-      contents: read
-      id-token: write
-
-    env:
-      AWS_REGION: us-east-1
 
     steps:
       - uses: actions/checkout@v4
@@ -28,9 +29,9 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          role-to-assume: arn:aws:iam::${{ env.DEV_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
+          role-session-name: gha-${{ github.run_id }}
 
       - name: Build all lambdas
         run: npm run build:all
@@ -44,22 +45,14 @@ jobs:
         run: |
           terraform plan -input=false \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }} \
+            -var expected_account_id=${{ env.DEV_AWS_ACCOUNT_ID }} \
             -var jwt_secret=${{ secrets.JWT_SECRET }} \
             -var environment=development
 
   deploy:
     runs-on: ubuntu-latest
-    environment: fast-food-auth-api-env-dev
-    needs: build
+    needs: plan
     if: github.event_name == 'push'
-
-    permissions:
-      contents: read
-      id-token: write
-
-    env:
-      AWS_REGION: us-east-1
 
     steps:
       - uses: actions/checkout@v4
@@ -69,9 +62,9 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          role-to-assume: arn:aws:iam::${{ env.DEV_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
+          role-session-name: gha-${{ github.run_id }}
 
       - name: Build all lambdas
         run: npm run build:all
@@ -85,6 +78,6 @@ jobs:
         run: |
           terraform apply -input=false -auto-approve \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }} \
+            -var expected_account_id=${{ env.DEV_AWS_ACCOUNT_ID }} \
             -var jwt_secret=${{ secrets.JWT_SECRET }} \
             -var environment=development
