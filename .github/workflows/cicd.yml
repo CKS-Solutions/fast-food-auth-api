@@ -1,17 +1,15 @@
 name: Terraform
 
 on:
-  pull_request:
-    branches: [ "develop" ]
   push:
-    branches: [ "develop" ]
+    branches: [ "master" ]
 
 permissions:
   contents: read
   id-token: write
 
 concurrency:
-  group: dev-${{ github.workflow }}-${{ github.ref }}
+  group: prod-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -29,7 +27,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ env.DEV_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
+          role-to-assume: arn:aws:iam::${{ env.PROD_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: gha-${{ github.run_id }}
 
@@ -38,21 +36,21 @@ jobs:
 
       - name: Terraform Init
         working-directory: terraform
-        run: terraform init -input=false -backend-config="envs/dev/backend.hcl"
+        run: terraform init -input=false -backend-config="envs/prod/backend.hcl"
 
       - name: Terraform Plan
         working-directory: terraform
         run: |
           terraform plan -input=false \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ env.DEV_AWS_ACCOUNT_ID }} \
+            -var expected_account_id=${{ env.PROD_AWS_ACCOUNT_ID }} \
             -var jwt_secret=${{ secrets.JWT_SECRET }} \
-            -var environment=development
+            -var environment=production
 
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     needs: plan
-    if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v4
@@ -62,7 +60,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ env.DEV_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
+          role-to-assume: arn:aws:iam::${{ env.PROD_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: gha-${{ github.run_id }}
 
@@ -71,13 +69,13 @@ jobs:
 
       - name: Terraform Init
         working-directory: terraform
-        run: terraform init -input=false -backend-config="envs/dev/backend.hcl"
+        run: terraform init -input=false -backend-config="envs/prod/backend.hcl"
 
       - name: Terraform Apply
         working-directory: terraform
         run: |
           terraform apply -input=false -auto-approve \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ env.DEV_AWS_ACCOUNT_ID }} \
+            -var expected_account_id=${{ env.PROD_AWS_ACCOUNT_ID }} \
             -var jwt_secret=${{ secrets.JWT_SECRET }} \
-            -var environment=development
+            -var environment=production
