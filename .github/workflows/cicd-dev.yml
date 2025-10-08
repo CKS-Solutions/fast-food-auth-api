@@ -1,0 +1,89 @@
+name: Terraform
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: 
+      name: fast-food-auth-api-env-dev
+      url: ""
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      AWS_REGION: us-east-1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build all lambdas
+        run: npm run build:all
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -input=false -backend-config="envs/dev/backend.hcl"
+
+      - name: Terraform Plan
+        working-directory: terraform
+        run: |
+          terraform plan -input=false \
+            -var aws_region=${{ env.AWS_REGION }} \
+            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }} \
+            -var jwt_secret=${{ secrets.JWT_SECRET }} \
+            -var environment=development
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: fast-food-auth-api-env-dev
+    needs: build
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      AWS_REGION: us-east-1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build all lambdas
+        run: npm run build:all
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -input=false -backend-config="envs/dev/backend.hcl"
+
+      - name: Terraform Apply
+        working-directory: terraform
+        run: |
+          terraform apply -input=false -auto-approve \
+            -var aws_region=${{ env.AWS_REGION }} \
+            -var expected_account_id=${{ secrets.AWS_ACCOUNT_ID }} \
+            -var jwt_secret=${{ secrets.JWT_SECRET }} \
+            -var environment=development

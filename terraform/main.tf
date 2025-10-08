@@ -43,6 +43,11 @@ module "lambda" {
   cognito_user_pool_id = module.cognito.user_pool_id
   cognito_client_id    = module.cognito.user_pool_client_id
   aws_region           = var.aws_region
+  lambda_bucket_id     = module.s3.lambda_bucket_id
+  lambda_struct = {
+    lambda_auth_key          = module.s3.lambda_auth_key
+    lambda_auth_base64sha256 = module.s3.lambda_auth_base64sha256
+  }
   environment_variables = {
     NODE_ENV   = var.environment
     JWT_SECRET = var.jwt_secret
@@ -76,6 +81,16 @@ module "cognito" {
   source = "./modules/cognito"
 
   user_pool_name = var.user_pool_name
+  tags = {
+    Environment = var.environment
+    Project     = "fast-food"
+  }
+}
+
+# S3 Module
+module "s3" {
+  source = "./modules/s3"
+
   tags = {
     Environment = var.environment
     Project     = "fast-food"
