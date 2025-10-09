@@ -1,0 +1,83 @@
+name: Terraform
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+  push:
+    branches: [ "develop" ]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: dev-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.DEV_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: gha-${{ github.run_id }}
+
+      - name: Build all lambdas
+        run: npm run build:all
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -input=false -backend-config="envs/dev/backend.hcl"
+
+      - name: Terraform Plan
+        working-directory: terraform
+        run: |
+          terraform plan -input=false \
+            -var aws_region=${{ env.AWS_REGION }} \
+            -var expected_account_id=${{ vars.DEV_AWS_ACCOUNT_ID }} \
+            -var jwt_secret=${{ secrets.JWT_SECRET }} \
+            -var environment=development
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: plan
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.DEV_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: gha-${{ github.run_id }}
+
+      - name: Build all lambdas
+        run: npm run build:all
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -input=false -backend-config="envs/dev/backend.hcl"
+
+      - name: Terraform Apply
+        working-directory: terraform
+        run: |
+          terraform apply -input=false -auto-approve \
+            -var aws_region=${{ env.AWS_REGION }} \
+            -var expected_account_id=${{ vars.DEV_AWS_ACCOUNT_ID }} \
+            -var jwt_secret=${{ secrets.JWT_SECRET }} \
+            -var environment=development

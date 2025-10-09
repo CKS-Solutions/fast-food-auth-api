@@ -16,6 +16,8 @@ exports.handler = async (event) => {
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
 
+  console.log("New version of the auth lambda");
+
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,

@@ -56,3 +56,16 @@ variable "aws_region" {
   type        = string
   default     = "us-east-1"
 }
+
+variable "lambda_bucket_id" {
+  description = "Lambda bucket ID"
+  type        = string
+}
+
+variable "lambda_struct" {
+  description = "Lambda struct containing lambdas metadata"
+  type = object({
+    lambda_auth_key          = string
+    lambda_auth_base64sha256 = string
+  })
+}
