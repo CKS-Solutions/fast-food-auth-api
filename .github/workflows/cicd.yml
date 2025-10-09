@@ -27,7 +27,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ env.PROD_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
+          role-to-assume: arn:aws:iam::${{ vars.PROD_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: gha-${{ github.run_id }}
 
@@ -43,7 +43,7 @@ jobs:
         run: |
           terraform plan -input=false \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ env.PROD_AWS_ACCOUNT_ID }} \
+            -var expected_account_id=${{ vars.PROD_AWS_ACCOUNT_ID }} \
             -var jwt_secret=${{ secrets.JWT_SECRET }} \
             -var environment=production
 
@@ -60,7 +60,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ env.PROD_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
+          role-to-assume: arn:aws:iam::${{ vars.PROD_AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: gha-${{ github.run_id }}
 
@@ -76,6 +76,6 @@ jobs:
         run: |
           terraform apply -input=false -auto-approve \
             -var aws_region=${{ env.AWS_REGION }} \
-            -var expected_account_id=${{ env.PROD_AWS_ACCOUNT_ID }} \
+            -var expected_account_id=${{ vars.PROD_AWS_ACCOUNT_ID }} \
             -var jwt_secret=${{ secrets.JWT_SECRET }} \
             -var environment=production
