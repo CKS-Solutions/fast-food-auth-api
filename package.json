@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build:auth",
-    "build:auth": "cd src/auth && go mod download && GOOS=linux GOARCH=amd64 go build -o main main.go && zip auth.zip main",
+    "build:auth": "cd src/auth && go mod download && GOOS=linux GOARCH=amd64 go build -o bootstrap main.go && zip auth.zip bootstrap",
     "build:all": "npm run build:auth",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

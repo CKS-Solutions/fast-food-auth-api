@@ -40,8 +40,8 @@ jobs:
         run: |
           cd src/auth
           go mod download
-          GOOS=linux GOARCH=amd64 go build -o main main.go
-          zip auth.zip main
+          GOOS=linux GOARCH=amd64 go build -o bootstrap main.go
+          zip auth.zip bootstrap
 
       - name: Terraform Init
         working-directory: terraform
@@ -82,8 +82,8 @@ jobs:
         run: |
           cd src/auth
           go mod download
-          GOOS=linux GOARCH=amd64 go build -o main main.go
-          zip auth.zip main
+          GOOS=linux GOARCH=amd64 go build -o bootstrap main.go
+          zip auth.zip bootstrap
 
       - name: Terraform Init
         working-directory: terraform
