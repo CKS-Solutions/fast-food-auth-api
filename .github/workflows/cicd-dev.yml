@@ -33,8 +33,17 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: gha-${{ github.run_id }}
 
-      - name: Build all lambdas
-        run: npm run build:all
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25.1'
+
+      - name: Build Go Lambda function
+        run: |
+          cd src/auth
+          go mod download
+          GOOS=linux GOARCH=amd64 go build -o main main.go
+          zip auth.zip main
 
       - name: Terraform Init
         working-directory: terraform
@@ -66,8 +75,17 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: gha-${{ github.run_id }}
 
-      - name: Build all lambdas
-        run: npm run build:all
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25.1'
+
+      - name: Build Go Lambda function
+        run: |
+          cd src/auth
+          go mod download
+          GOOS=linux GOARCH=amd64 go build -o main main.go
+          zip auth.zip main
 
       - name: Terraform Init
         working-directory: terraform

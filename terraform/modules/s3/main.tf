@@ -1,7 +1,7 @@
 data "archive_file" "lambda_auth" {
   type = "zip"
 
-  source_dir  = "${path.module}/../../../src/auth"
+  source_file = "${path.module}/../../../src/auth/main.go"
   output_path = "${path.module}/../../../src/auth.zip"
 }
 

@@ -37,7 +37,7 @@ module "lambda" {
 
   function_name        = "fast-food-api"
   lambda_role_arn      = module.iam.lambda_role_arn
-  runtime              = "nodejs18.x"
+  runtime              = "provided.al2023"
   timeout              = 30
   memory_size          = 128
   cognito_user_pool_id = module.cognito.user_pool_id

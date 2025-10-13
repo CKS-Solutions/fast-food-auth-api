@@ -5,7 +5,7 @@ resource "aws_lambda_function" "api_lambda" {
   s3_key    = var.lambda_struct.lambda_auth_key
 
   runtime = var.runtime
-  handler = "index.handler"
+  handler = "main"
 
   source_code_hash = var.lambda_struct.lambda_auth_base64sha256
 
